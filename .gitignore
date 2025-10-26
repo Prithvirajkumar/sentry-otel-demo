@@ -1,0 +1,11 @@
+# Ignore node_modules for all projects
+node-typing-game-backend/node_modules/
+node-typing-game-frontend/node_modules/
+
+# Ignore logs and environment files
+*.log
+.env
+
+# Ignore OS and editor files
+.DS_Store
+.vscode/
