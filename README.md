@@ -63,3 +63,4 @@ See the individual `README.md` files in `node-typing-game-frontend/` and `node-t
 
 This project is for demonstration and learning purposes.
 # sentry-otel-demo-collector
+# sentry-otel-demo-collector
