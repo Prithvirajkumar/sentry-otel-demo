@@ -15,12 +15,10 @@ const {
 const { OTLPLogExporter } = require("@opentelemetry/exporter-logs-otlp-http");
 const { trace } = require("@opentelemetry/api");
 
-// Configure Sentry OTLP log exporter
+// Configure OTLP log exporter to send to local OTel Collector
 const logExporter = new OTLPLogExporter({
-  url: "https://o1161257.ingest.us.sentry.io/api/4505918888935424/integration/otlp/v1/logs", // Sentry log ingest endpoint
-  headers: {
-    "x-sentry-auth": "sentry sentry_key=a54f975c0645b4e41d3ff35a27a1a34f", // Sentry auth key
-  },
+  url: "http://localhost:4318/v1/logs", // Local OTel Collector endpoint
+  // No auth headers needed for local collector
 });
 
 // Set up OTel logger provider with Sentry exporter
@@ -32,10 +30,8 @@ const logger = loggerProvider.getLogger("default", "1.0.0"); // Main logger inst
 // Configure OTel NodeSDK for distributed tracing
 const sdk = new NodeSDK({
   traceExporter: new OTLPTraceExporter({
-    url: "https://o1161257.ingest.us.sentry.io/api/4505918888935424/integration/otlp/v1/traces", // Sentry trace ingest endpoint
-    headers: {
-      "x-sentry-auth": "sentry sentry_key=a54f975c0645b4e41d3ff35a27a1a34f", // Sentry auth key
-    },
+    url: "http://localhost:4318/v1/traces", // Local OTel Collector endpoint
+    // No auth headers needed for local collector
   }),
   serviceName: "typing-game", // Service name for trace grouping
   instrumentations: [getNodeAutoInstrumentations()], // Auto-instrument common Node modules

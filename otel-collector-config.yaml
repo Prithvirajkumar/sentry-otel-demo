@@ -1,0 +1,68 @@
+# OpenTelemetry Collector Configuration
+# Routes traces and logs from Node.js apps to Sentry.io
+
+receivers:
+  # OTLP receiver for HTTP protocol (default port 4318)
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  # Batch processor to group spans/logs for efficiency
+  batch:
+    timeout: 10s
+    send_batch_size: 1024
+
+  # Add resource attributes for better filtering
+  resource:
+    attributes:
+      - key: deployment.environment
+        value: production
+        action: insert
+
+exporters:
+  # Exporter for backend traces and logs
+  otlphttp/backend:
+    traces_endpoint: https://o1161257.ingest.us.sentry.io/api/4510585073369088/integration/otlp/v1/traces
+    logs_endpoint: https://o1161257.ingest.us.sentry.io/api/4510585073369088/integration/otlp/v1/logs
+    headers:
+      x-sentry-auth: "sentry sentry_key=c25f59354a8ee19faeb653dcebc48785"
+    compression: gzip
+    encoding: proto
+    timeout: 30s
+
+  # Exporter for frontend traces and logs
+  otlphttp/frontend:
+    traces_endpoint: https://o1161257.ingest.us.sentry.io/api/4510585067864064/integration/otlp/v1/traces
+    logs_endpoint: https://o1161257.ingest.us.sentry.io/api/4510585067864064/integration/otlp/v1/logs
+    headers:
+      x-sentry-auth: "sentry sentry_key=9b0e1ae6af903816f468f3dc1bc42287"
+    compression: gzip
+    encoding: proto
+    timeout: 30s
+
+  # Optional: Debug exporter for local troubleshooting
+  debug:
+    verbosity: basic
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [otlphttp/backend, otlphttp/frontend, debug]
+    
+    logs:
+      receivers: [otlp]
+      processors: [resource, batch]
+      exporters: [otlphttp/backend, otlphttp/frontend, debug]
+
+  telemetry:
+    logs:
+      level: debug
+
